@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merenda+ — Sistema Completo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#22c55e',
+                        'primary-foreground': '#ffffff',
+                        secondary: '#f59e0b',
+                        muted: '#f3f4f6',
+                        'muted-foreground': '#6b7280',
+                        destructive: '#ef4444',
+                        background: '#ffffff',
+                        foreground: '#111827',
+                        sidebar: '#f8fafc',
+                        'sidebar-foreground': '#334155',
+                        'sidebar-accent': '#e2e8f0',
+                        'sidebar-accent-foreground': '#1e293b',
+                        'sidebar-border': '#e2e8f0'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+        }
+        .hidden { display: none !important; }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Complete interactive application with login, dashboard, and all CRUD operations -->
+    
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen gradient-bg flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-lg shadow-lg border">
+            <div class="text-center p-6 pb-4">
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <svg class="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/>
+                    </svg>
+                    <div>
+                        <h1 class="text-2xl font-bold text-primary">Merenda+</h1>
+                        <p class="text-secondary font-medium text-sm">Desperdiça Não!</p>
+                    </div>
+                </div>
+                <p class="text-muted-foreground">Faça login para acessar o sistema</p>
+            </div>
+
+            <div class="p-6 pt-0">
+                <form id="loginForm" class="space-y-4">
+                    <div class="space-y-2">
+                        <label for="email" class="text-sm font-medium">Email</label>
+                        <input id="email" type="email" placeholder="seu@email.com" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label for="password" class="text-sm font-medium">Senha</label>
+                        <div class="relative">
+                            <input id="password" type="password" placeholder="Sua senha" class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            <button type="button" id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                <svg id="eyeIcon" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="errorAlert" class="hidden p-3 bg-red-50 border border-red-200 rounded-md">
+                        <p class="text-red-800 text-sm" id="errorMessage"></p>
+                    </div>
+
+                    <button type="submit" id="loginButton" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors">
+                        Entrar
+                    </button>
+                </form>
+
+                <div class="mt-6 p-4 bg-muted rounded-lg">
+                    <p class="text-sm font-medium mb-2">Usuários de teste:</p>
+                    <div class="text-xs space-y-1">
+                        <p class="cursor-pointer hover:text-primary" onclick="fillCredentials('admin@escola.com', 'admin123')"><strong>Admin:</strong> admin@escola.com / admin123</p>
+                        <p class="cursor-pointer hover:text-primary" onclick="fillCredentials('maria@escola.com', 'maria123')"><strong>Merendeira:</strong> maria@escola.com / maria123</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden min-h-screen bg-background">
+        <!-- Header -->
+        <header class="bg-primary text-primary-foreground shadow-sm">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/>
+                            </svg>
+                            <div>
+                                <h1 class="text-xl font-bold">Merenda+</h1>
+                                <p class="text-sm opacity-90">Desperdiça Não!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="mobileMenuBtn" class="md:hidden">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border transform transition-transform duration-200 ease-in-out -translate-x-full md:translate-x-0" style="top: 80px;">
+                <div class="flex flex-col h-full">
+                    <div class="p-6">
+                        <h2 class="text-lg font-semibold text-sidebar-foreground">Menu</h2>
+                        <div id="userInfo" class="mt-2 text-sm text-sidebar-foreground/70">
+                            <p id="userName"></p>
+                            <p id="userType" class="capitalize"></p>
+                        </div>
+                    </div>
+
+                    <nav class="flex-1 px-4 space-y-2">
+                        <a href="#" onclick="showSection('dashboard')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-section="dashboard">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"/>
+                            </svg>
+                            Dashboard
+                        </a>
+                        <a href="#" onclick="showSection('estoque')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-section="estoque">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                            Estoque
+                        </a>
+                        <a href="#" onclick="showSection('desperdicio')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-section="desperdicio">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Desperdício
+                        </a>
+                        <a href="#" onclick="showSection('relatorios')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-section="relatorios">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            Relatórios
+                        </a>
+                        <a href="#" onclick="showSection('usuarios')" id="usersLink" class="nav-link hidden flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" data-section="usuarios">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                            </svg>
+                            Usuários
+                        </a>
+                    </nav>
+
+                    <div class="p-4">
+                        <button id="logoutBtn" class="w-full flex items-center justify-start gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            Sair
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 md:ml-64 p-6">
+                <!-- Dashboard Section -->
+                <div id="dashboardSection" class="section">
+                    <div class="space-y-6">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+                            <p class="text-muted-foreground">Visão geral do sistema de gestão de merenda</p>
+                        </div>
+
+                        <!-- Metric Cards -->
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-muted-foreground">Estoque Total</p>
+                                        <p class="text-2xl font-bold text-foreground" id="totalStock">0</p>
+                                        <p class="text-xs text-muted-foreground">Itens em estoque</p>
+                                    </div>
+                                    <div class="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                                        <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-muted-foreground">Itens Vencendo</p>
+                                        <p class="text-2xl font-bold text-secondary" id="expiringItems">0</p>
+                                        <p class="text-xs text-muted-foreground">Próximos 7 dias</p>
+                                    </div>
+                                    <div class="h-12 w-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                                        <svg class="h-6 w-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-muted-foreground">Desperdício do Mês</p>
+                                        <p class="text-2xl font-bold text-destructive" id="monthlyWaste">0</p>
+                                        <p class="text-xs text-muted-foreground">Itens desperdiçados</p>
+                                    </div>
+                                    <div class="h-12 w-12 bg-destructive/10 rounded-lg flex items-center justify-center">
+                                        <svg class="h-6 w-6 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-muted-foreground">Taxa de Aproveitamento</p>
+                                        <p class="text-2xl font-bold text-primary" id="utilizationRate">87%</p>
+                                        <p class="text-xs text-muted-foreground">Meta: 90%</p>
+                                    </div>
+                                    <div class="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                                        <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="bg-white p-6 rounded-lg shadow-sm border">
+                            <h3 class="text-lg font-semibold mb-4">Atividades Recentes</h3>
+                            <div id="recentActivities" class="space-y-4">
+                                <!-- Activities will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estoque Section -->
+                <div id="estoqueSection" class="section hidden">
+                    <div class="space-y-6">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight">Gestão de Estoque</h1>
+                            <p class="text-muted-foreground">Gerencie os itens do estoque da merenda escolar</p>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border">
+                            <div class="p-6">
+                                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                                    <div class="relative flex-1">
+                                        <input type="text" id="inventorySearch" placeholder="Buscar por nome ou categoria..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        </svg>
+                                    </div>
+                                    <button onclick="openInventoryModal()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 flex items-center gap-2">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Adicionar Item
+                                    </button>
+                                </div>
+
+                                <div class="overflow-x-auto">
+                                    <table class="w-full">
+                                        <thead>
+                                            <tr class="border-b">
+                                                <th class="text-left py-3 px-4 font-medium">Nome</th>
+                                                <th class="text-left py-3 px-4 font-medium">Categoria</th>
+                                                <th class="text-left py-3 px-4 font-medium">Quantidade</th>
+                                                <th class="text-left py-3 px-4 font-medium">Validade</th>
+                                                <th class="text-left py-3 px-4 font-medium">Status</th>
+                                                <th class="text-right py-3 px-4 font-medium">Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="inventoryTableBody">
+                                            <!-- Inventory items will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desperdício Section -->
+                <div id="desperdicioSection" class="section hidden">
+                    <div class="space-y-6">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight">Controle de Desperdício</h1>
+                            <p class="text-muted-foreground">Registre e monitore os desperdícios de merenda escolar</p>
+                        </div>
+
+                        <div class="grid gap-6 lg:grid-cols-2">
+                            <!-- Waste Form -->
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <h3 class="text-lg font-semibold mb-4">Registrar Desperdício</h3>
+                                <form id="wasteForm" class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Nome do Item</label>
+                                        <select id="wasteItemSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                                            <option value="">Selecione o item desperdiçado</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Quantidade Desperdiçada</label>
+                                        <input type="number" id="wasteQuantity" min="1" placeholder="Ex: 5" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Motivo do Desperdício</label>
+                                        <select id="wasteReason" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                                            <option value="">Selecione o motivo</option>
+                                            <option value="Vencimento">Vencimento</option>
+                                            <option value="Deterioração">Deterioração</option>
+                                            <option value="Contaminação">Contaminação</option>
+                                            <option value="Embalagem danificada">Embalagem danificada</option>
+                                            <option value="Sobra não consumida">Sobra não consumida</option>
+                                            <option value="Erro de preparo">Erro de preparo</option>
+                                            <option value="Outros">Outros</option>
+                                        </select>
+                                    </div>
+                                    <div id="customReasonDiv" class="hidden">
+                                        <label class="block text-sm font-medium mb-2">Especifique o motivo</label>
+                                        <textarea id="customReason" placeholder="Descreva o motivo do desperdício..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="3"></textarea>
+                                    </div>
+                                    <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                        Registrar Desperdício
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Waste History -->
+                            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                                <h3 class="text-lg font-semibold mb-4">Histórico de Desperdícios</h3>
+                                <div id="wasteHistory" class="space-y-4 max-h-96 overflow-y-auto">
+                                    <!-- Waste records will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relatórios Section -->
+                <div id="relatoriosSection" class="section hidden">
+                    <div class="space-y-6">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight">Relatórios</h1>
+                            <p class="text-muted-foreground">Análise detalhada do desperdício e performance do sistema</p>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow-sm border">
+                            <h3 class="text-lg font-semibold mb-4">Resumo Mensal</h3>
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div class="text-center p-4 bg-green-50 rounded-lg">
+                                    <p class="text-2xl font-bold text-green-600" id="reportTotalItems">0</p>
+                                    <p class="text-sm text-green-800">Total de Itens</p>
+                                </div>
+                                <div class="text-center p-4 bg-red-50 rounded-lg">
+                                    <p class="text-2xl font-bold text-red-600" id="reportWastedItems">0</p>
+                                    <p class="text-sm text-red-800">Itens Desperdiçados</p>
+                                </div>
+                                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                                    <p class="text-2xl font-bold text-blue-600" id="reportEfficiency">0%</p>
+                                    <p class="text-sm text-blue-800">Eficiência</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow-sm border">
+                            <h3 class="text-lg font-semibold mb-4">Itens Mais Desperdiçados</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b">
+                                            <th class="text-left py-3 px-4 font-medium">Item</th>
+                                            <th class="text-left py-3 px-4 font-medium">Quantidade</th>
+                                            <th class="text-left py-3 px-4 font-medium">Motivo Principal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mostWastedItems">
+                                        <!-- Most wasted items will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usuários Section -->
+                <div id="usuariosSection" class="section hidden">
+                    <div class="space-y-6">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight">Gestão de Usuários</h1>
+                            <p class="text-muted-foreground">Gerencie os usuários do sistema Merenda+</p>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border">
+                            <div class="p-6">
+                                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                                    <div class="relative flex-1">
+                                        <input type="text" id="userSearch" placeholder="Buscar por nome, email ou tipo..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        </svg>
+                                    </div>
+                                    <button onclick="openUserModal()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 flex items-center gap-2">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Adicionar Usuário
+                                    </button>
+                                </div>
+
+                                <div class="overflow-x-auto">
+                                    <table class="w-full">
+                                        <thead>
+                                            <tr class="border-b">
+                                                <th class="text-left py-3 px-4 font-medium">Usuário</th>
+                                                <th class="text-left py-3 px-4 font-medium">Email</th>
+                                                <th class="text-left py-3 px-4 font-medium">Tipo</th>
+                                                <th class="text-left py-3 px-4 font-medium">Status</th>
+                                                <th class="text-right py-3 px-4 font-medium">Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="userTableBody">
+                                            <!-- Users will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="inventoryModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold mb-4" id="inventoryModalTitle">Adicionar Novo Item</h3>
+                <form id="inventoryForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nome do Item</label>
+                        <input type="text" id="itemName" placeholder="Ex: Arroz, Feijão, Leite..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Categoria</label>
+                        <select id="itemCategory" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            <option value="">Selecione uma categoria</option>
+                            <option value="Grãos">Grãos</option>
+                            <option value="Laticínios">Laticínios</option>
+                            <option value="Panificados">Panificados</option>
+                            <option value="Frutas">Frutas</option>
+                            <option value="Verduras">Verduras</option>
+                            <option value="Carnes">Carnes</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Condimentos">Condimentos</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Quantidade</label>
+                        <input type="number" id="itemQuantity" min="1" placeholder="Ex: 50" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Data de Validade</label>
+                        <input type="date" id="itemExpiryDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div class="flex gap-4 pt-4">
+                        <button type="button" onclick="closeInventoryModal()" class="flex-1 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 bg-primary text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                            <span id="inventorySubmitText">Adicionar Item</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold mb-4" id="userModalTitle">Adicionar Novo Usuário</h3>
+                <form id="userForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nome Completo</label>
+                        <input type="text" id="userFullName" placeholder="Ex: Maria Silva" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" id="userEmail" placeholder="usuario@escola.com" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Tipo de Usuário</label>
+                        <select id="userType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="admin">Administrador</option>
+                            <option value="merendeira">Merendeira</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="userActive" checked class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <label for="userActive" class="text-sm font-medium">Usuário ativo</label>
+                    </div>
+                    <div class="flex gap-4 pt-4">
+                        <button type="button" onclick="closeUserModal()" class="flex-1 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 bg-primary text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                            <span id="userSubmitText">Criar Usuário</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="successToast" class="hidden fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center gap-2">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span id="successMessage">Operação realizada com sucesso!</span>
+        </div>
+    </div>
+
+    <script>
+        
+        // Application State
+        let currentUser = null;
+        let currentSection = 'dashboard';
+        let editingInventoryId = null;
+        let editingUserId = null;
+
+        // Mock Data
+        let inventory = [
+            { id: 1, name: 'Arroz Branco', category: 'Grãos', quantity: 50, expiryDate: '2024-12-30' },
+            { id: 2, name: 'Feijão Preto', category: 'Grãos', quantity: 30, expiryDate: '2024-12-25' },
+            { id: 3, name: 'Leite Integral', category: 'Laticínios', quantity: 25, expiryDate: '2024-12-20' },
+            { id: 4, name: 'Pão Francês', category: 'Panificados', quantity: 40, expiryDate: '2024-12-18' },
+            { id: 5, name: 'Banana', category: 'Frutas', quantity: 60, expiryDate: '2024-12-22' }
+        ];
+
+        let wasteRecords = [
+            { id: 1, itemName: 'Leite Integral', quantity: 5, reason: 'Vencimento', date: '2024-12-15', registeredBy: 'Maria Silva' },
+            { id: 2, itemName: 'Pão Francês', quantity: 10, reason: 'Deterioração', date: '2024-12-14', registeredBy: 'João Santos' }
+        ];
+
+        let users = [
+            { id: 1, name: 'Administrador', email: 'admin@escola.com', type: 'admin', status: 'active', createdAt: '2024-01-15' },
+            { id: 2, name: 'Maria Silva', email: 'maria@escola.com', type: 'merendeira', status: 'active', createdAt: '2024-02-20' },
+            { id: 3, name: 'João Santos', email: 'joao@escola.com', type: 'merendeira', status: 'inactive', createdAt: '2024-03-10' }
+        ];
+
+        const testUsers = [
+            { email: 'admin@escola.com', password: 'admin123', role: 'admin', name: 'Administrador' },
+            { email: 'maria@escola.com', password: 'maria123', role: 'merendeira', name: 'Maria Silva' }
+        ];
+
+        // Utility Functions
+        function generateId() {
+            return Date.now() + Math.random();
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('pt-BR');
+        }
+
+        function getExpiryStatus(expiryDate) {
+            const today = new Date();
+            const expiry = new Date(expiryDate);
+            const diffTime = expiry.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                return { status: 'expired', label: 'Vencido', class: 'bg-red-100 text-red-800' };
+            } else if (diffDays <= 7) {
+                return { status: 'expiring', label: 'Vencendo', class: 'bg-yellow-100 text-yellow-800' };
+            } else {
+                return { status: 'fresh', label: 'Válido', class: 'bg-green-100 text-green-800' };
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('successToast');
+            const messageEl = document.getElementById('successMessage');
+            messageEl.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Authentication Functions
+        function fillCredentials(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+        }
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginButton = document.getElementById('loginButton');
+
+            errorAlert.classList.add('hidden');
+            loginButton.textContent = 'Entrando...';
+            loginButton.disabled = true;
+
+            setTimeout(() => {
+                const user = testUsers.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    showMainApp();
+                } else {
+                    errorMessage.textContent = 'Email ou senha inválidos';
+                    errorAlert.classList.remove('hidden');
+                }
+                
+                loginButton.textContent = 'Entrar';
+                loginButton.disabled = false;
+            }, 1000);
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showMainApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // Update user info
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userType').textContent = currentUser.role;
+            
+            // Show admin-only sections
+            if (currentUser.role === 'admin') {
+                document.getElementById('usersLink').classList.remove('hidden');
+                document.getElementById('usersLink').classList.add('flex');
+            }
+            
+            // Show dashboard by default
+            showSection('dashboard');
+            updateDashboard();
+        }
+
+        // Navigation Functions
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('bg-sidebar-accent', 'text-sidebar-accent-foreground');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + 'Section').classList.remove('hidden');
+            
+            // Add active class to current nav link
+            const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+            if (activeLink) {
+                activeLink.classList.add('bg-sidebar-accent', 'text-sidebar-accent-foreground');
+            }
+            
+            currentSection = sectionName;
+            
+            // Update section-specific data
+            switch (sectionName) {
+                case 'dashboard':
+                    updateDashboard();
+                    break;
+                case 'estoque':
+                    updateInventoryTable();
+                    updateWasteItemSelect();
+                    break;
+                case 'desperdicio':
+                    updateWasteHistory();
+                    updateWasteItemSelect();
+                    break;
+                case 'relatorios':
+                    updateReports();
+                    break;
+                case 'usuarios':
+                    if (currentUser.role === 'admin') {
+                        updateUserTable();
+                    }
+                    break;
+            }
+            
+            // Close mobile menu
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+        }
+
+        // Dashboard Functions
+        function updateDashboard() {
+            const totalStock = inventory.reduce((sum, item) => sum + item.quantity, 0);
+            const expiringItems = inventory.filter(item => {
+                const status = getExpiryStatus(item.expiryDate);
+                return status.status === 'expiring' || status.status === 'expired';
+            }).length;
+            const monthlyWaste = wasteRecords.reduce((sum, record) => sum + record.quantity, 0);
+            
+            document.getElementById('totalStock').textContent = totalStock;
+            document.getElementById('expiringItems').textContent = expiringItems;
+            document.getElementById('monthlyWaste').textContent = monthlyWaste;
+            
+            // Update recent activities
+            const recentActivities = document.getElementById('recentActivities');
+            const activities = [
+                { text: 'Estoque atualizado', time: 'Há 2 horas', color: 'bg-primary' },
+                { text: 'Desperdício registrado', time: 'Há 4 horas', color: 'bg-destructive' },
+                { text: 'Relatório gerado', time: 'Ontem', color: 'bg-secondary' }
+            ];
+            
+            recentActivities.innerHTML = activities.map(activity => `
+                <div class="flex items-start gap-3">
+                    <div class="h-2 w-2 ${activity.color} rounded-full mt-2"></div>
+                    <div>
+                        <p class="text-sm font-medium">${activity.text}</p>
+                        <p class="text-xs text-muted-foreground">${activity.time}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Inventory Functions
+        function updateInventoryTable() {
+            const tbody = document.getElementById('inventoryTableBody');
+            const searchTerm = document.getElementById('inventorySearch').value.toLowerCase();
+            
+            const filteredInventory = inventory.filter(item => 
+                item.name.toLowerCase().includes(searchTerm) || 
+                item.category.toLowerCase().includes(searchTerm)
+            );
+            
+            tbody.innerHTML = filteredInventory.map(item => {
+                const expiryStatus = getExpiryStatus(item.expiryDate);
+                return `
+                    <tr class="border-b">
+                        <td class="py-3 px-4 font-medium">${item.name}</td>
+                        <td class="py-3 px-4">${item.category}</td>
+                        <td class="py-3 px-4">${item.quantity} unidades</td>
+                        <td class="py-3 px-4">${formatDate(item.expiryDate)}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${expiryStatus.class}">
+                                ${expiryStatus.label}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <button onclick="editInventoryItem(${item.id})" class="text-blue-600 hover:text-blue-800 mr-2">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </button>
+                            <button onclick="deleteInventoryItem(${item.id})" class="text-red-600 hover:text-red-800">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openInventoryModal(item = null) {
+            const modal = document.getElementById('inventoryModal');
+            const title = document.getElementById('inventoryModalTitle');
+            const submitText = document.getElementById('inventorySubmitText');
+            
+            if (item) {
+                title.textContent = 'Editar Item';
+                submitText.textContent = 'Salvar Alterações';
+                document.getElementById('itemName').value = item.name;
+                document.getElementById('itemCategory').value = item.category;
+                document.getElementById('itemQuantity').value = item.quantity;
+                document.getElementById('itemExpiryDate').value = item.expiryDate;
+                editingInventoryId = item.id;
+            } else {
+                title.textContent = 'Adicionar Novo Item';
+                submitText.textContent = 'Adicionar Item';
+                document.getElementById('inventoryForm').reset();
+                editingInventoryId = null;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeInventoryModal() {
+            document.getElementById('inventoryModal').classList.add('hidden');
+            document.getElementById('inventoryForm').reset();
+            editingInventoryId = null;
+        }
+
+        function editInventoryItem(id) {
+            const item = inventory.find(i => i.id === id);
+            if (item) {
+                openInventoryModal(item);
+            }
+        }
+
+        function deleteInventoryItem(id) {
+            if (confirm('Tem certeza que deseja excluir este item?')) {
+                inventory = inventory.filter(i => i.id !== id);
+                updateInventoryTable();
+                updateDashboard();
+                showToast('Item excluído com sucesso!');
+            }
+        }
+
+        function saveInventoryItem(e) {
+            e.preventDefault();
+            
+            const itemData = {
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('itemCategory').value,
+                quantity: parseInt(document.getElementById('itemQuantity').value),
+                expiryDate: document.getElementById('itemExpiryDate').value
+            };
+            
+            if (editingInventoryId) {
+                const index = inventory.findIndex(i => i.id === editingInventoryId);
+                inventory[index] = { ...itemData, id: editingInventoryId };
+                showToast('Item atualizado com sucesso!');
+            } else {
+                inventory.push({ ...itemData, id: generateId() });
+                showToast('Item adicionado com sucesso!');
+            }
+            
+            closeInventoryModal();
+            updateInventoryTable();
+            updateDashboard();
+        }
+
+        // Waste Functions
+        function updateWasteItemSelect() {
+            const select = document.getElementById('wasteItemSelect');
+            select.innerHTML = '<option value="">Selecione o item desperdiçado</option>' +
+                inventory.map(item => `
+                    <option value="${item.name}">${item.name} (${item.quantity} disponíveis)</option>
+                `).join('');
+        }
+
+        function updateWasteHistory() {
+            const container = document.getElementById('wasteHistory');
+            const sortedRecords = [...wasteRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            container.innerHTML = sortedRecords.length > 0 ? sortedRecords.map(record => `
+                <div class="border rounded-lg p-4 space-y-3">
+                    <div class="flex items-start justify-between">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium">${record.itemName}</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">${record.quantity} unidades</span>
+                            </div>
+                            <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">${record.reason}</span>
+                        </div>
+                        <div class="text-right text-sm text-muted-foreground">
+                            ${formatDate(record.date)}
+                        </div>
+                    </div>
+                    <div class="text-sm text-muted-foreground">
+                        Registrado por: ${record.registeredBy}
+                    </div>
+                </div>
+            `).join('') : '<p class="text-center py-8 text-muted-foreground">Nenhum registro de desperdício encontrado.</p>';
+        }
+
+        function saveWasteRecord(e) {
+            e.preventDefault();
+            
+            const itemName = document.getElementById('wasteItemSelect').value;
+            const quantity = parseInt(document.getElementById('wasteQuantity').value);
+            const reason = document.getElementById('wasteReason').value;
+            const customReason = document.getElementById('customReason').value;
+            
+            const finalReason = reason === 'Outros' ? customReason : reason;
+            
+            const wasteRecord = {
+                id: generateId(),
+                itemName,
+                quantity,
+                reason: finalReason,
+                date: new Date().toISOString().split('T')[0],
+                registeredBy: currentUser.name
+            };
+            
+            wasteRecords.unshift(wasteRecord);
+            
+            // Update inventory
+            const inventoryItem = inventory.find(item => item.name === itemName);
+            if (inventoryItem) {
+                inventoryItem.quantity = Math.max(0, inventoryItem.quantity - quantity);
+            }
+            
+            document.getElementById('wasteForm').reset();
+            document.getElementById('customReasonDiv').classList.add('hidden');
+            updateWasteHistory();
+            updateInventoryTable();
+            updateDashboard();
+            showToast('Desperdício registrado com sucesso!');
+        }
+
+        // Reports Functions
+        function updateReports() {
+            const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
+            const wastedItems = wasteRecords.reduce((sum, record) => sum + record.quantity, 0);
+            const efficiency = totalItems > 0 ? Math.round(((totalItems - wastedItems) / totalItems) * 100) : 0;
+            
+            document.getElementById('reportTotalItems').textContent = totalItems;
+            document.getElementById('reportWastedItems').textContent = wastedItems;
+            document.getElementById('reportEfficiency').textContent = efficiency + '%';
+            
+            // Most wasted items
+            const wasteByItem = {};
+            wasteRecords.forEach(record => {
+                if (!wasteByItem[record.itemName]) {
+                    wasteByItem[record.itemName] = { quantity: 0, reasons: {} };
+                }
+                wasteByItem[record.itemName].quantity += record.quantity;
+                wasteByItem[record.itemName].reasons[record.reason] = (wasteByItem[record.itemName].reasons[record.reason] || 0) + 1;
+            });
+            
+            const mostWasted = Object.entries(wasteByItem)
+                .sort(([,a], [,b]) => b.quantity - a.quantity)
+                .slice(0, 5);
+            
+            const tbody = document.getElementById('mostWastedItems');
+            tbody.innerHTML = mostWasted.map(([itemName, data]) => {
+                const topReason = Object.entries(data.reasons).sort(([,a], [,b]) => b - a)[0];
+                return `
+                    <tr class="border-b">
+                        <td class="py-3 px-4 font-medium">${itemName}</td>
+                        <td class="py-3 px-4">${data.quantity} unidades</td>
+                        <td class="py-3 px-4">${topReason ? topReason[0] : '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // User Functions
+        function updateUserTable() {
+            const tbody = document.getElementById('userTableBody');
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            
+            const filteredUsers = users.filter(user => 
+                user.name.toLowerCase().includes(searchTerm) || 
+                user.email.toLowerCase().includes(searchTerm) ||
+                user.type.toLowerCase().includes(searchTerm)
+            );
+            
+            tbody.innerHTML = filteredUsers.map(user => `
+                <tr class="border-b">
+                    <td class="py-3 px-4 font-medium">${user.name}</td>
+                    <td class="py-3 px-4">${user.email}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${user.type === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">
+                            ${user.type === 'admin' ? 'Administrador' : 'Merendeira'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${user.status === 'active' ? 'Ativo' : 'Inativo'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="editUser(${user.id})" class="text-blue-600 hover:text-blue-800 mr-2">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        <button onclick="deleteUser(${user.id})" class="text-red-600 hover:text-red-800">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openUserModal(user = null) {
+            const modal = document.getElementById('userModal');
+            const title = document.getElementById('userModalTitle');
+            const submitText = document.getElementById('userSubmitText');
+            
+            if (user) {
+                title.textContent = 'Editar Usuário';
+                submitText.textContent = 'Salvar Alterações';
+                document.getElementById('userFullName').value = user.name;
+                document.getElementById('userEmail').value = user.email;
+                document.getElementById('userType').value = user.type;
+                document.getElementById('userActive').checked = user.status === 'active';
+                editingUserId = user.id;
+            } else {
+                title.textContent = 'Adicionar Novo Usuário';
+                submitText.textContent = 'Criar Usuário';
+                document.getElementById('userForm').reset();
+                document.getElementById('userActive').checked = true;
+                editingUserId = null;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+            document.getElementById('userForm').reset();
+            editingUserId = null;
+        }
+
+        function editUser(id) {
+            const user = users.find(u => u.id === id);
+            if (user) {
+                openUserModal(user);
+            }
+        }
+
+        function deleteUser(id) {
+            if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                users = users.filter(u => u.id !== id);
+                updateUserTable();
+                showToast('Usuário excluído com sucesso!');
+            }
+        }
+
+        function saveUser(e) {
+            e.preventDefault();
+            
+            const userData = {
+                name: document.getElementById('userFullName').value,
+                email: document.getElementById('userEmail').value,
+                type: document.getElementById('userType').value,
+                status: document.getElementById('userActive').checked ? 'active' : 'inactive'
+            };
+            
+            if (editingUserId) {
+                const index = users.findIndex(u => u.id === editingUserId);
+                users[index] = { ...users[index], ...userData };
+                showToast('Usuário atualizado com sucesso!');
+            } else {
+                users.push({ 
+                    ...userData, 
+                    id: generateId(),
+                    createdAt: new Date().toISOString().split('T')[0]
+                });
+                showToast('Usuário criado com sucesso!');
+            }
+            
+            closeUserModal();
+            updateUserTable();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("[v0] DOM loaded, initializing app");
+            
+            // Check for existing session
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            }
+
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    login();
+                });
+            }
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log("[v0] Nav link clicked:", this.getAttribute('data-section'));
+                    const section = this.getAttribute('data-section');
+                    if (section) {
+                        showSection(section);
+                    }
+                });
+            });
+
+            const togglePassword = document.getElementById('togglePassword');
+            if (togglePassword) {
+                togglePassword.addEventListener('click', function() {
+                    const passwordInput = document.getElementById('password');
+                    const eyeIcon = document.getElementById('eyeIcon');
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    if (type === 'text') {
+                        eyeIcon.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+                        `;
+                    } else {
+                        eyeIcon.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        `;
+                    }
+                });
+            }
+
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
+
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    sidebar.classList.toggle('-translate-x-full');
+                });
+            }
+
+            const addInventoryBtn = document.getElementById('addInventoryBtn');
+            if (addInventoryBtn) {
+                addInventoryBtn.addEventListener('click', function() {
+                    console.log("[v0] Add inventory button clicked");
+                    openInventoryModal();
+                });
+            }
+
+            const addUserBtn = document.getElementById('addUserBtn');
+            if (addUserBtn) {
+                addUserBtn.addEventListener('click', function() {
+                    console.log("[v0] Add user button clicked");
+                    openUserModal();
+                });
+            }
+
+            const inventorySearch = document.getElementById('inventorySearch');
+            if (inventorySearch) {
+                inventorySearch.addEventListener('input', updateInventoryTable);
+            }
+            
+            const userSearch = document.getElementById('userSearch');
+            if (userSearch) {
+                userSearch.addEventListener('input', updateUserTable);
+            }
+
+            const inventoryForm = document.getElementById('inventoryForm');
+            if (inventoryForm) {
+                inventoryForm.addEventListener('submit', saveInventoryItem);
+            }
+            
+            const wasteForm = document.getElementById('wasteForm');
+            if (wasteForm) {
+                wasteForm.addEventListener('submit', saveWasteRecord);
+            }
+            
+            const userForm = document.getElementById('userForm');
+            if (userForm) {
+                userForm.addEventListener('submit', saveUser);
+            }
+
+            const wasteReason = document.getElementById('wasteReason');
+            if (wasteReason) {
+                wasteReason.addEventListener('change', function() {
+                    const customDiv = document.getElementById('customReasonDiv');
+                    if (this.value === 'Outros') {
+                        customDiv.classList.remove('hidden');
+                        document.getElementById('customReason').required = true;
+                    } else {
+                        customDiv.classList.add('hidden');
+                        document.getElementById('customReason').required = false;
+                    }
+                });
+            }
+
+            const closeInventoryModal = document.getElementById('closeInventoryModal');
+            if (closeInventoryModal) {
+                closeInventoryModal.addEventListener('click', function() {
+                    console.log("[v0] Close inventory modal clicked");
+                    closeInventoryModal();
+                });
+            }
+            
+            const closeUserModal = document.getElementById('closeUserModal');
+            if (closeUserModal) {
+                closeUserModal.addEventListener('click', function() {
+                    console.log("[v0] Close user modal clicked");
+                    closeUserModal();
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal-overlay')) {
+                    closeInventoryModal();
+                    closeUserModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeInventoryModal();
+                    closeUserModal();
+                }
+            });
+
+            console.log("[v0] All event listeners initialized");
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Merenda+</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#22c55e',
+                        'primary-foreground': '#ffffff',
+                        secondary: '#f59e0b',
+                        muted: '#f3f4f6',
+                        'muted-foreground': '#6b7280',
+                        destructive: '#ef4444',
+                        background: '#ffffff',
+                        foreground: '#111827',
+                        sidebar: '#f8fafc',
+                        'sidebar-foreground': '#334155',
+                        'sidebar-accent': '#e2e8f0',
+                        'sidebar-accent-foreground': '#1e293b',
+                        'sidebar-border': '#e2e8f0'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans antialiased bg-background">
+    <!-- Updated header to match original design with primary background -->
+    <header class="bg-primary text-primary-foreground shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/>
+                    </svg>
+                    <div>
+                        <h1 class="text-xl font-bold">Merenda+</h1>
+                        <p class="text-sm opacity-90">Desperdiça Não!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Added sidebar navigation matching original design -->
+        <aside class="fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border transform transition-transform duration-200 ease-in-out translate-x-0" style="top: 80px;">
+            <div class="flex flex-col h-full">
+                <div class="p-6">
+                    <h2 class="text-lg font-semibold text-sidebar-foreground">Menu</h2>
+                    <div id="userInfo" class="mt-2 text-sm text-sidebar-foreground/70">
+                        <p id="userName"></p>
+                        <p id="userType" class="capitalize"></p>
+                    </div>
+                </div>
+
+                <nav class="flex-1 px-4 space-y-2">
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium bg-sidebar-accent text-sidebar-accent-foreground">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        Estoque
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Desperdício
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Relatórios
+                    </a>
+                    <a href="#" id="usersLink" class="hidden flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                        </svg>
+                        Usuários
+                    </a>
+                </nav>
+
+                <div class="p-4">
+                    <button id="logoutBtn" class="w-full flex items-center justify-start gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Sair
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Updated main content area to match original layout with proper spacing -->
+        <main class="flex-1 md:ml-64 p-6">
+            <div class="space-y-6">
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+                    <p class="text-muted-foreground">Visão geral do sistema de gestão de merenda</p>
+                </div>
+
+                <!-- Metric Cards -->
+                <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-muted-foreground">Estoque Total</p>
+                                <p class="text-2xl font-bold text-foreground">1,247</p>
+                                <p class="text-xs text-muted-foreground">Itens em estoque</p>
+                            </div>
+                            <div class="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-muted-foreground">Itens Vencendo</p>
+                                <p class="text-2xl font-bold text-secondary">23</p>
+                                <p class="text-xs text-muted-foreground">Próximos 7 dias</p>
+                            </div>
+                            <div class="h-12 w-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                                <svg class="h-6 w-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-muted-foreground">Desperdício do Mês</p>
+                                <p class="text-2xl font-bold text-destructive">45</p>
+                                <p class="text-xs text-muted-foreground">Itens desperdiçados</p>
+                            </div>
+                            <div class="h-12 w-12 bg-destructive/10 rounded-lg flex items-center justify-center">
+                                <svg class="h-6 w-6 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-muted-foreground">Taxa de Aproveitamento</p>
+                                <p class="text-2xl font-bold text-primary">87%</p>
+                                <p class="text-xs text-muted-foreground">Meta: 90%</p>
+                            </div>
+                            <div class="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts and Recent Activity -->
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Gráfico de Desperdício</h3>
+                        <div class="h-64 flex items-center justify-center text-muted-foreground">
+                            <p>Gráfico será implementado aqui</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Atividades Recentes</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <div class="h-2 w-2 bg-primary rounded-full mt-2"></div>
+                                <div>
+                                    <p class="text-sm font-medium">Estoque atualizado</p>
+                                    <p class="text-xs text-muted-foreground">Há 2 horas</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="h-2 w-2 bg-destructive rounded-full mt-2"></div>
+                                <div>
+                                    <p class="text-sm font-medium">Desperdício registrado</p>
+                                    <p class="text-xs text-muted-foreground">Há 4 horas</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="h-2 w-2 bg-secondary rounded-full mt-2"></div>
+                                <div>
+                                    <p class="text-sm font-medium">Relatório gerado</p>
+                                    <p class="text-xs text-muted-foreground">Ontem</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expiring Items Alert -->
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-orange-800 mb-2">
+                        ⚠️ Atenção: Itens próximos ao vencimento
+                    </h3>
+                    <div class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="text-sm">
+                            <span class="font-medium">Leite Integral</span> - 50 unidades
+                            <br>
+                            <span class="text-orange-600">Vence em: 2 dias</span>
+                        </div>
+                        <div class="text-sm">
+                            <span class="font-medium">Pão Francês</span> - 30 unidades
+                            <br>
+                            <span class="text-orange-600">Vence em: 5 dias</span>
+                        </div>
+                        <div class="text-sm">
+                            <span class="font-medium">Iogurte Natural</span> - 25 unidades
+                            <br>
+                            <span class="text-orange-600">Vence em: 7 dias</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        } else {
+            // Display user info
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userType').textContent = currentUser.role;
+            
+            // Show users link for admin
+            if (currentUser.role === 'admin') {
+                document.getElementById('usersLink').classList.remove('hidden');
+                document.getElementById('usersLink').classList.add('flex');
+            }
+        }
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
