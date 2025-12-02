@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react"
 
+import Script from "next/script"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Leaf, Eye, EyeOff } from "lucide-react"
@@ -44,6 +45,30 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center p-4">
+
+      {/* ------------------------ */}
+      {/* 🔹 Google Login Scripts */}
+      {/* ------------------------ */}
+
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        strategy="afterInteractive"
+      />
+
+      <Script id="google-login">
+        {`
+          function handleGoogleLogin(response) {
+            const data = jwt_decode(response.credential);
+            console.log("GOOGLE USER:", data);
+            window.location.href = "/dashboard";
+          }
+        `}
+      </Script>
+
+      {/* ------------------------ */}
+      {/* 🔹 Tela de Login */}
+      {/* ------------------------ */}
+
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -57,6 +82,8 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -68,6 +95,8 @@ export default function LoginPage() {
                 required
               />
             </div>
+
+            {/* Senha */}
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
               <div className="relative">
@@ -91,17 +120,44 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Erro */}
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
+            {/* Botão Entrar */}
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
+
+            {/* ------------------------ */}
+            {/* 🔹 BOTÃO GOOGLE LOGIN   */}
+            {/* ------------------------ */}
+
+            <div
+              id="g_id_onload"
+              data-client_id="455761949556-sr8p8if7cpp1it32776e224s9k2ch4qc.apps.googleusercontent.com"
+              data-context="signin"
+              data-ux_mode="redirect"
+              data-login_uri="/dashboard"
+              data-callback="handleGoogleLogin"
+            ></div>
+
+            <div
+              className="g_id_signin"
+              data-type="standard"
+              data-size="large"
+              data-theme="outline"
+              data-text="sign_in_with"
+              data-shape="rectangular"
+              data-logo_alignment="left"
+            ></div>
+
           </form>
 
+          {/* Usuários de teste */}
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm font-medium mb-2">Usuários de teste:</p>
             <div className="text-xs space-y-1">
@@ -114,7 +170,6 @@ export default function LoginPage() {
             </div>
           </div>
         </CardContent>
-        
       </Card>
     </div>
   )
